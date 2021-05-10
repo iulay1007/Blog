@@ -316,3 +316,55 @@ case MESSAGE_POST_RESULT里实际调用AsyncTask里的finish方法 :
     }
 ```
 
+
+
+**AsyncTask中有两个线程池（SerialExecutor和THREAD_POOL_EXECUTOR），和一个Handler (InternalHandler)，其中SerialExecutor用于任务的排队，而THREAD_POOL_EXECUTOR用于真正地执行任务。InternalHandler用于子线程与主线程的通信。**
+
+
+
+**Q ** : 为什么AsyncTask的类必须在主线程中加载？
+
+注意题目问的是类的加载，而非类对象的创建。
+
+首先理解一下这两个发送message的方法。
+
+> ```undefined
+> Message msg = handler.obtainMessage(); 
+> msg.arg1 = i; 
+> msg.sendToTarget(); 
+> 
+> Message msg=new Message(); 
+> msg.arg1=i; 
+> handler.sendMessage(msg); 
+> ```
+>
+> - 第一种写法是message 从handler 类获取，从而可以直接向该handler 对象发送消息;
+> - 第二种写法是直接调用 handler 的发送消息方法发送消息。
+>
+> > 推荐第一种写法，此写法的 message 来自 MessagePool ,省去了创建对象申请内存的开销
+>
+>
+
+**A ** :  因为mWoker里的postResult方法用的是上面的第一个方式。结合Handler相关知识，知道要向哪发消息，则应该在哪里创建Handler。这里的Handler实际是静态成员。由于静态成员会在类加载的时候进行初始化，因此变相要求AsyncTask的类必须在主线程中加载。
+
+而这个AsyncTask的类在主线程中加载的过程在Android4.1及以上版本中已经被系统自动完成了。在ActivelyThread的main方法会调用AsyncTask的init方法。
+
+
+
+**Q** : 为什么AsyncTask默认为串行执行的呢？
+
+**A** : 由于一个进程内所有的AsyncTask都是使用的同一个线程池执行任务；如果同时有几个AsyncTask一起并行执行的话，恰好AysncTask的使用者在doInbackgroud里面访问了相同的资源，但是自己没有处理同步问题；那么就有可能导致灾难性的后果！
+
+由于开发者通常不会意识到需要对他们创建的所有的AsyncTask对象里面的doInbackgroud做同步处理，因此，API的设计者为了避免这种无意中访问并发资源的问题，干脆把这个API设置为默认所有串行执行的了。
+
+如果你明确知道自己需要并行处理任务，那么你需要使用executeOnExecutor(Executor exec,Params... params)这个函数来指定你用来执行任务的线程池
+
+
+
+额外补充几点注意事项：
+
+1.AsyncTask的对象必须在UI线程中创建，在源码里规定的
+
+2.execute方法必须在UI线程中调用，在源码里被注解的
+
+3.一个AsyncTask对象的execute方法只能调用一次，否则会报运行时异常

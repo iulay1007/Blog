@@ -74,7 +74,7 @@ WorkerRunnable实现了Callable接口，并实现了它的call方法，在call�
             Result result = null;
             try {
 // 设置线程的优先级
-      、          Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+               Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                 
 //调用doInBackground(mParams)方法，doInBackground(mParams)由开发者来实现
                 result = doInBackground(mParams);

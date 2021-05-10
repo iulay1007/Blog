@@ -431,3 +431,6 @@ class CustomChildThread extends Thread {
 }
 ```
 
+
+
+//TODO:Handler构造函数中有一个async参数，与同步，异步消息有关。涉及到同步屏障。网上的说法：`屏障消息` 的出现，他的作用是：**忽略所有的同步消息，返回异步消息。再换句话说，同步屏障为Handler消息机制增加了一种简单的优先级机制，异步消息的优先级要高于同步消息。**`View绘制` 相关的知识点中就有**同步屏障** 的使用：https://dandanlove.blog.csdn.net/article/details/78775166 挖个坑以后填qwq
