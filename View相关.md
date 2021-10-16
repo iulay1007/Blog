@@ -592,7 +592,7 @@ protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
 从ViewRoot的performTraversals方法开始，从上到下遍历整个视图树，每个View控件负责绘制自己，而ViewGroup还需要负责通知自己的子View进行绘制操作。
 
-经过measure、layout、draw三个过程才能最终将一个View绘制出来。**measure**测量View的宽高，**layout**确定View在父容器中放置的位置，而draw则负责将Viewhui，而**draw**负责将View 绘制到屏幕上
+经过measure、layout、draw三个过程才能最终将一个View绘制出来。**measure**测量View的宽高，**layout**确定View在父容器中放置的位置，而**draw**负责将View 绘制到屏幕上
 
 
 
